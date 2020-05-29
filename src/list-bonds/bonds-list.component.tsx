@@ -23,7 +23,7 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
 			minVolume: 10000,
 			minToMature: 30,
 			maxToMature: 500,
-			name: 'втб,сбер,гпб,рсхб,вэб,полюс,ржд,альфа',
+			name: 'втб,сбер,гпб,рсхб,вэб,полюс,ржд,альфа,почта,bcs,rus,вымпел,газп,камаз,моэск,мтс,магнит,мегаф,откр,полюс,промсв,росб,росн,ростел,фск',
 			onlyActive: true,
 			onlyCheap: true,
 		},

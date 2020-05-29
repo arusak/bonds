@@ -50,7 +50,7 @@ function renderRow(security: Bond) {
 		<td className={styles.cellNumber}>{$(couponValue)}</td>
 		<td className={styles.cellNumber}>{couponPeriod}</td>
 		<td className={styles.cellNumber}>{couponsToMature}</td>
-		<td className={styles.cellNumber} title={`Спред ${spread}`}>{volume}</td>
+		<td className={styles.cellNumber} title={`Спред ${spread}`}>{formatMillions(volume)}</td>
 		<td className={styles.cellNumber}>{$(accruedInterestMy)} ({$(accruedInterest)})</td>
 		<td className={styles.cellNumber}>{$(totalCashFlow)}</td>
 		<td className={styles.cellNumber}>{$(totalEarnings)}</td>
@@ -59,6 +59,11 @@ function renderRow(security: Bond) {
 	</tr>;
 }
 
-function $(value: number) {
-	return value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function $(value: number, digits = 2) {
+	return value.toLocaleString('ru-RU', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+
+function formatMillions(value: number) {
+	let millions = value / 1000000;
+	return (millions >= 0.1 ? $(millions, 1) : '< 0,1') + ' млн.';
 }
