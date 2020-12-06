@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import {Bond} from '../models/bond.model';
+import { Bond } from '../models/bond.model';
 import styles from './bonds-table.module.sass';
 
 type BondsTableComponentProps = {
@@ -8,17 +8,14 @@ type BondsTableComponentProps = {
 }
 
 export const BondsTableComponent = (props: BondsTableComponentProps) => {
-    const {list} = props;
+    const { list } = props;
     return (
-        <>
-            <h1>Облигации на Мосбирже ({list.length})</h1>
-            <table className={styles.table}>
-                {renderHeader()}
-                <tbody>
-                {list.map(renderRow)}
-                </tbody>
-            </table>
-        </>
+        <table className={styles.table}>
+            {renderHeader()}
+            <tbody>
+            {list.map(renderRow)}
+            </tbody>
+        </table>
     );
 };
 
@@ -26,7 +23,7 @@ function renderHeader() {
     return (
         <thead>
         <tr className={styles.headRow}>
-            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Будет выплачено\nк погашению', 'Общий\nдоход, р', '% годовых', 'ISIN']
+            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Будет выплачено\nк погашению', 'Налог', 'Общий\nдоход, р', '% годовых', 'ISIN']
                 .map((h, i) => <th key={i}>{h}</th>)}
         </tr>
         </thead>
@@ -34,7 +31,8 @@ function renderHeader() {
 }
 
 function renderRow(security: Bond) {
-    const {shortName, name, matureDate, couponValue, isin, couponPeriod, accruedInterest, volume, spread, quote} = security;
+    const taxFraction = 0.13;
+    const { shortName, name, matureDate, couponValue, isin, couponPeriod, accruedInterest, volume, spread, quote } = security;
     const nominal = security.nominal;
     const price = nominal * quote / 100;
     const daysToMature = matureDate.diffNow('days').days | 0;
@@ -42,7 +40,8 @@ function renderRow(security: Bond) {
     const accruedInterestMy = nextCoupon * couponValue / couponPeriod;
     const couponsToMature = Math.floor(daysToMature / couponPeriod) + 1;
     const totalCashFlow = couponsToMature * couponValue + nominal;
-    const totalEarnings = totalCashFlow - accruedInterestMy - price;
+    const couponTax = couponsToMature * couponValue * taxFraction;
+    const totalEarnings = totalCashFlow - accruedInterestMy - price - couponTax;
     const totalEarningsPercent = Math.round(totalEarnings / price / daysToMature * 365 * 10000) / 100;
     return <tr className={styles.row} key={isin}>
         <td className={styles.cellText} title={name}>{shortName}</td>
@@ -57,6 +56,7 @@ function renderRow(security: Bond) {
         })} title={`Спред ${spread}`}>{formatMillions(volume)}</td>
         <td className={styles.cellNumber}>{$(accruedInterestMy)} ({$(accruedInterest)})</td>
         <td className={styles.cellNumber}>{$(totalCashFlow)}</td>
+        <td className={styles.cellNumber}>{$(couponTax)}</td>
         <td className={styles.cellNumber}>{$(totalEarnings)}</td>
         <td className={styles.cellNumber}>{totalEarningsPercent}&thinsp;%</td>
         <td className={styles.cellText}>{isin}</td>
@@ -64,7 +64,7 @@ function renderRow(security: Bond) {
 }
 
 function $(value: number, digits = 2) {
-    return value.toLocaleString('ru-RU', {minimumFractionDigits: digits, maximumFractionDigits: digits});
+    return value.toLocaleString('ru-RU', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 function formatMillions(value: number) {
