@@ -1,13 +1,25 @@
+.table
+  border-collapse: collapse
+
 .cellText
   text-align: left
 
 .cellNumber
   text-align: right
 
+.cellGood
+  background: #99ffd5
+
+.cellOk
+  background: #deffdf
+
 .row td
   padding: 0.5rem 0.25rem
-  border-bottom: thin solid #ddd
+  border-bottom: thin solid #dfdfdf
 
 .headRow th
+  text-align: right
   white-space: pre
   padding: 0.5rem 0.25rem
+  &:first-child
+    text-align: left

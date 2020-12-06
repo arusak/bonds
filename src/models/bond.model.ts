@@ -26,7 +26,6 @@ export function securityFromApi(
 	marketData: any[],
 	yields: any[],
 ): Bond {
-	console.log(yields);
 	return {
 		shortName: SHORTNAME,
 		name: SECNAME,
