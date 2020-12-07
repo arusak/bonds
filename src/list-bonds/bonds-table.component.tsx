@@ -51,10 +51,12 @@ function renderRow(security: Bond) {
         <td className={styles.cellNumber}>{$(couponValue)}</td>
         <td className={styles.cellNumber}>{couponPeriod}</td>
         <td className={styles.cellNumber}>{couponsToMature}</td>
-        <td className={classnames(styles.cellNumber, {
-            [styles.cellOk]: volume > 5000000 && volume < 10000000,
-            [styles.cellGood]: volume > 10000000,
-        })} title={`Спред ${spread}`}>{formatMillions(volume)}</td>
+        <td className={styles.cellNumber} title={`Спред ${spread}`}>
+            <span className={classnames({
+                [styles.cellOk]: volume > 5000000 && volume < 10000000,
+                [styles.cellGood]: volume > 10000000,
+            })}>{formatMillions(volume)}</span>
+        </td>
         <td className={styles.cellNumber}>{$(accruedInterestMy)} ({$(accruedInterest)})</td>
         <td className={styles.cellNumber}>{$(totalCashFlow)}</td>
         <td className={styles.cellNumber}>{$(grossEarnings)}</td>

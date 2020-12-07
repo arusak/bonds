@@ -1,5 +1,6 @@
 body {
 	margin: 0;
+	padding: 0 0.25rem;
 	font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI',
 	'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
 	sans-serif;

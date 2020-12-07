@@ -42,7 +42,7 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
 
         return (
             <div>
-                <h1>Облигации на Мосбирже ({list.length})</h1>
+                <h1 className={styles.title}>Облигации на Мосбирже</h1>
                 <div className={styles.main}>
                     <BondsTableComponent list={list}/>
                 </div>
