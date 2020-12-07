@@ -23,7 +23,7 @@ function renderHeader() {
     return (
         <thead>
         <tr className={styles.headRow}>
-            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Будет выплачено\nк погашению', 'Налог', 'Общий\nдоход, р', '% годовых', 'ISIN']
+            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Выплаты\nк погашению', 'Общий\nдоход, р', 'Налог', 'Чистый\nдоход, р', 'Доходность,\n% годовых', 'ISIN']
                 .map((h, i) => <th key={i}>{h}</th>)}
         </tr>
         </thead>
@@ -37,12 +37,13 @@ function renderRow(security: Bond) {
     const price = nominal * quote / 100;
     const daysToMature = matureDate.diffNow('days').days | 0;
     const nextCoupon = (couponPeriod - daysToMature % couponPeriod - 1);
-    const accruedInterestMy = nextCoupon * couponValue / couponPeriod;
+    const accruedInterestMy = (nextCoupon + 1) * couponValue / couponPeriod;
     const couponsToMature = Math.floor(daysToMature / couponPeriod) + 1;
     const totalCashFlow = couponsToMature * couponValue + nominal;
-    const couponTax = couponsToMature * couponValue * taxFraction;
-    const totalEarnings = totalCashFlow - accruedInterestMy - price - couponTax;
-    const totalEarningsPercent = Math.round(totalEarnings / price / daysToMature * 365 * 10000) / 100;
+    const grossEarnings = totalCashFlow - accruedInterestMy - price;
+    const couponTax = grossEarnings * taxFraction;
+    const netEarnings = grossEarnings - couponTax;
+    const netEarningsPercent = Math.round(grossEarnings / price / daysToMature * 365 * 10000) / 100;
     return <tr className={styles.row} key={isin}>
         <td className={styles.cellText} title={name}>{shortName}</td>
         <td className={styles.cellNumber} title={matureDate.toFormat('dd.MM.yyyy')}>{daysToMature}</td>
@@ -56,9 +57,10 @@ function renderRow(security: Bond) {
         })} title={`Спред ${spread}`}>{formatMillions(volume)}</td>
         <td className={styles.cellNumber}>{$(accruedInterestMy)} ({$(accruedInterest)})</td>
         <td className={styles.cellNumber}>{$(totalCashFlow)}</td>
+        <td className={styles.cellNumber}>{$(grossEarnings)}</td>
         <td className={styles.cellNumber}>{$(couponTax)}</td>
-        <td className={styles.cellNumber}>{$(totalEarnings)}</td>
-        <td className={styles.cellNumber}>{totalEarningsPercent}&thinsp;%</td>
+        <td className={styles.cellNumber}>{$(netEarnings)}</td>
+        <td className={styles.cellNumber}>{netEarningsPercent}&thinsp;%</td>
         <td className={styles.cellText}>{isin}</td>
     </tr>;
 }
