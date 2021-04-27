@@ -34,9 +34,9 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
         const list = this.props.list
             .filter(this.sanitize)
             .filter(this.filterOnlyActive)
-            .filter(this.filterByName)
+            // .filter(this.filterByName)
             .filter(this.filterOnlyCheap)
-            .filter(this.filterByVolume)
+            // .filter(this.filterByVolume)
             .filter(this.filterByToMature)
             .sort(this.sortByMatureDate);
 
@@ -47,8 +47,7 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
                     <BondsTableComponent list={list}/>
                 </div>
                 <div className={styles.disclaimer}>
-                    <p>В таблице приведены облигации эмитентов с рейтингом не ниже A со сроками погашения от 1 до 18
-                        мес.</p>
+                    {/*<p>В таблице приведены облигации эмитентов с рейтингом не ниже A со сроками погашения от 1 до 18 мес.</p>*/}
                     <p>Расчёт не учитывает возможную оферту, амортизацию и переменный купон. Для принятия
                         инвестиционного решения
                         изучите информацию об облигации. Проще всего найти её по ISIN на <a

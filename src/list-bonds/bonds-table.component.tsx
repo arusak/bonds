@@ -23,7 +23,7 @@ function renderHeader() {
     return (
         <thead>
         <tr className={styles.headRow}>
-            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Выплаты\nк погашению', 'Общий\nдоход, р', 'Налог', 'Чистый\nдоход, р', 'Доходность,\n% годовых', 'ISIN']
+            {['Облигация', 'Срок', 'Цена', 'Купон', 'Пер-д', 'Осталось', 'Объем', 'НКД', 'Выплаты\nк погашению', 'Общий\nдоход, р', 'Налог', 'Комиссия, р', 'Чистый\nдоход, р', 'Доходность,\n% годовых', 'ISIN']
                 .map((h, i) => <th key={i}>{h}</th>)}
         </tr>
         </thead>
@@ -32,9 +32,11 @@ function renderHeader() {
 
 function renderRow(security: Bond) {
     const taxFraction = 0.13;
-    const { shortName, name, matureDate, couponValue, isin, couponPeriod, accruedInterest, volume, spread, quote } = security;
-    const nominal = security.nominal;
+    const { nominal, shortName, name, matureDate, couponValue, isin, couponPeriod, volume, spread, quote } = security;
+
     const price = nominal * quote / 100;
+    const brokerFee = price * 0.01 * 0.07;
+    const exchangeFee = price * 0.01 * 0.01;
     const daysToMature = matureDate.diffNow('days').days | 0;
     const nextCoupon = (couponPeriod - daysToMature % couponPeriod - 1);
     const accruedInterestMy = (nextCoupon + 1) * couponValue / couponPeriod;
@@ -42,8 +44,9 @@ function renderRow(security: Bond) {
     const totalCashFlow = couponsToMature * couponValue + nominal;
     const grossEarnings = totalCashFlow - accruedInterestMy - price;
     const couponTax = grossEarnings * taxFraction;
-    const netEarnings = grossEarnings - couponTax;
+    const netEarnings = grossEarnings - couponTax - brokerFee - exchangeFee;
     const netEarningsPercent = Math.round(grossEarnings / price / daysToMature * 365 * 10000) / 100;
+
     return <tr className={styles.row} key={isin}>
         <td className={styles.cellText} title={name}>{shortName}</td>
         <td className={styles.cellNumber} title={matureDate.toFormat('dd.MM.yyyy')}>{daysToMature}</td>
@@ -57,13 +60,18 @@ function renderRow(security: Bond) {
                 [styles.cellGood]: volume > 10000000,
             })}>{formatMillions(volume)}</span>
         </td>
-        <td className={styles.cellNumber}>{$(accruedInterestMy)} ({$(accruedInterest)})</td>
+        <td className={styles.cellNumber}>{$(accruedInterestMy)}</td>
         <td className={styles.cellNumber}>{$(totalCashFlow)}</td>
         <td className={styles.cellNumber}>{$(grossEarnings)}</td>
         <td className={styles.cellNumber}>{$(couponTax)}</td>
+        <td className={styles.cellNumber}>{$(brokerFee + exchangeFee)}</td>
         <td className={styles.cellNumber}>{$(netEarnings)}</td>
         <td className={styles.cellNumber}>{netEarningsPercent}&thinsp;%</td>
-        <td className={styles.cellText}>{isin}</td>
+        <td className={styles.cellText}>
+            <a href={`https://www.rusbonds.ru/compare.asp?go=1&tool=${isin}`}
+               target="_blank"
+               rel="noopener noreferrer">{isin}</a>
+        </td>
     </tr>;
 }
 
