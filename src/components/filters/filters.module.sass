@@ -1,0 +1,48 @@
+.container
+  display: flex
+
+  background: white
+
+.main
+  display: block
+
+  &_minimized
+    display: none
+
+.digest
+  display: flex
+  font-size: 0.9em
+
+  &_hidden
+    display: none
+
+.minimizer
+  border-radius: 50%
+  border: none
+  background: none
+
+  &_wrapper
+    padding: 0 1em 0 0
+
+  &__arrow
+    display: inline-block
+    transform: rotate(270deg)
+    transition: 200ms linear
+
+    &_up
+      transform: rotate(90deg)
+
+.parameter
+  display: flex
+  height: 1.8em
+  align-items: baseline
+
+  label
+    width: 15em
+
+  input[type=number]
+    max-width: 5em
+
+  input[type=text]
+    max-width: 35em
+

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-export type Bond = {
+export type BondModel = {
 	shortName: string,
 	name: string,
 	matureDate: DateTime,
@@ -9,7 +9,7 @@ export type Bond = {
 	isin: string,
 	couponPercent: number,
 	couponValue: number,
-	nextCoupon: DateTime,
+	nextCouponDate: DateTime,
 	accruedInterest: number,
 	couponPeriod: number,
 	averagePrice: number,
@@ -25,7 +25,7 @@ export function securityFromApi(
 		[string, string, string, number, number, number, string, number, number, number, number, string, string, string, number, number, number, number, number, string, string, string, string, string, string, number, string, number, string, string, string, string, string, number, number, string, number, string, string, number],
 	marketData: any[],
 	yields: any[],
-): Bond {
+): BondModel {
 	return {
 		shortName: SHORTNAME,
 		name: SECNAME,
@@ -34,7 +34,7 @@ export function securityFromApi(
 		couponPercent: COUPONPERCENT,
 		couponPeriod: COUPONPERIOD,
 		couponValue: COUPONVALUE,
-		nextCoupon: DateTime.fromISO(NEXTCOUPON),
+		nextCouponDate: DateTime.fromISO(NEXTCOUPON),
 		isin: ISIN,
 		offerDate: DateTime.fromISO(OFFERDATE),
 		settleDate: DateTime.fromISO(SETTLEDATE),

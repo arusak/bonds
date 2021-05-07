@@ -1,30 +1,27 @@
+import { fold } from 'fp-ts/lib/Option';
+import { pipe } from 'fp-ts/lib/pipeable';
 import React from 'react';
-import { Bond } from '../models/bond.model';
-import { BondsTableComponent } from './bonds-table.component';
-import styles from './bonds-list.module.sass';
+import { BondViewModel } from '../../models/bond.view-model';
+import { FilterDiff, FiltersValues } from '../../models/filters.model';
+import { BondsTableComponent } from '../bonds-table/bonds-table.component';
+import { FiltersComponent } from '../filters/filters.component';
+import styles from './dashboard.module.sass';
 
 export type BondsListProps = {
-    list: Bond[];
+    list: BondViewModel[];
 }
 
-type Filters = {
-    minVolume: number,
-    name: string,
-    minToMature: number,
-    maxToMature: number,
-    onlyActive: boolean,
-    onlyCheap: boolean,
-}
+type BondListState = { filters: FiltersValues };
 
-type BondListState = { filters: Filters };
-
-export class BondsListComponent extends React.Component<BondsListProps, BondListState> {
+export class DashboardComponent extends React.Component<BondsListProps, BondListState> {
     state = {
         filters: {
             minVolume: 10000,
             minToMature: 30,
             maxToMature: 548,
-            name: 'ингб,почтар,росморп,рсетилэ,сбер,северст,сзкк,спбго,татнфт,тойота,фолксв,фпк,рсхб,ржд,краснодкр,фск еэс,росатом,челяб,янао,самаробл,промсвб,альфа,башкорт,газпнф,газпрнеф,газпром,гпб,липецкоб,мособ,моэк,мрскце,мрскцп,мтс,мтс,новосиб,новсиб,норник,огк-2,россет,рсети,русгидро,транснф,трнф,хмао,откр,втб,москред,райфб,росбанк',
+            minNetEarnings: 4,
+            maxNetEarnings: 20,
+            name: '',
             onlyActive: true,
             onlyCheap: true,
         },
@@ -34,16 +31,21 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
         const list = this.props.list
             .filter(this.sanitize)
             .filter(this.filterOnlyActive)
-            // .filter(this.filterByName)
+            .filter(this.filterByName)
             .filter(this.filterOnlyCheap)
-            // .filter(this.filterByVolume)
+            .filter(this.filterByVolume)
             .filter(this.filterByToMature)
+            .filter(this.filterByNetEarnings)
             .sort(this.sortByMatureDate);
 
         return (
             <div>
                 <h1 className={styles.title}>Облигации на Мосбирже</h1>
                 <div className={styles.main}>
+                    <FiltersComponent filters={this.state.filters} onFiltersChange={this.handleFiltersChange}/>
+                    <div>
+                        {/*{JSON.stringify(this.state.filters, null, 2)}*/}
+                    </div>
                     <BondsTableComponent list={list}/>
                 </div>
                 <div className={styles.disclaimer}>
@@ -58,37 +60,54 @@ export class BondsListComponent extends React.Component<BondsListProps, BondList
         );
     }
 
-    private sanitize = (bond: Bond) => {
+    private handleFiltersChange = (diff: FilterDiff) => {
+        pipe(diff, fold(() => null, diff => {
+            const filters = {
+                ...this.state.filters,
+                ...diff,
+            };
+            this.setState({ filters });
+        }));
+    };
+
+    private sanitize = (bond: BondViewModel) => {
         // todo accruedInterest is 0 in some cases (for subords)
         return bond.quote > 100 && bond.couponPeriod > 10 && (bond.accruedInterest > 0);
     };
 
-    private sortByMatureDate = (i1: Bond, i2: Bond) => {
+    private sortByMatureDate = (i1: BondViewModel, i2: BondViewModel) => {
         return i1.matureDate > i2.matureDate ? 1 : -1;
     };
 
-    private filterOnlyCheap = (item: Bond) => {
+    private filterOnlyCheap = (item: BondViewModel) => {
         return !this.state.filters.onlyCheap || item.couponValue < 100;
     };
 
-    private filterOnlyActive = (item: Bond) => {
+    private filterOnlyActive = (item: BondViewModel) => {
         return !this.state.filters.onlyActive || item.couponValue > 1;
     };
 
-    private filterByName = (item: Bond) => {
+    private filterByName = (item: BondViewModel) => {
         const { filters: { name } } = this.state;
-        const names = name.split(',');
-        return names.length === 0 || !!names.find(name => item.shortName.toLowerCase().startsWith(name));
+        const terms = name.toLowerCase().split(',');
+        let currentItemName = item.shortName.toLowerCase();
+        return name.length === 0 || !!terms.find(term => currentItemName.startsWith(term));
     };
 
-    private filterByVolume = (item: Bond) => {
+    private filterByVolume = (item: BondViewModel) => {
         const { filters: { minVolume } } = this.state;
         return !minVolume || item.volume >= minVolume;
     };
 
-    private filterByToMature = (item: Bond) => {
+    private filterByToMature = (item: BondViewModel) => {
         const { filters: { minToMature, maxToMature } } = this.state;
         const toMature = item.matureDate.diffNow('days').days;
-        return toMature >= minToMature && toMature <= maxToMature;
+        return toMature >= minToMature && (!maxToMature || toMature <= maxToMature);
+    };
+
+    private filterByNetEarnings = (item: BondViewModel) => {
+        const { filters: { minNetEarnings, maxNetEarnings } } = this.state;
+        const netEarnings = item.couponPercent; // todo
+        return netEarnings >= minNetEarnings && (!maxNetEarnings || netEarnings <= maxNetEarnings);
     };
 }
