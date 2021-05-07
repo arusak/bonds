@@ -2,7 +2,7 @@ import { fold } from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/pipeable';
 import React from 'react';
 import { BondViewModel } from '../../models/bond.view-model';
-import { FilterDiff, FiltersValues } from '../../models/filters.model';
+import { FiltersDiff, FiltersValues } from '../../models/filters.model';
 import { BondsTableComponent } from '../bonds-table/bonds-table.component';
 import { FiltersComponent } from '../filters/filters.component';
 import styles from './dashboard.module.sass';
@@ -60,7 +60,8 @@ export class DashboardComponent extends React.Component<BondsListProps, BondList
         );
     }
 
-    private handleFiltersChange = (diff: FilterDiff) => {
+    private handleFiltersChange = (diff: FiltersDiff) => {
+        console.log(diff);
         pipe(diff, fold(() => null, diff => {
             const filters = {
                 ...this.state.filters,
@@ -107,7 +108,9 @@ export class DashboardComponent extends React.Component<BondsListProps, BondList
 
     private filterByNetEarnings = (item: BondViewModel) => {
         const { filters: { minNetEarnings, maxNetEarnings } } = this.state;
-        const netEarnings = item.couponPercent; // todo
-        return netEarnings >= minNetEarnings && (!maxNetEarnings || netEarnings <= maxNetEarnings);
+        const netEarnings = item.netEarningsAnnualPercent;
+        const b = netEarnings >= minNetEarnings && (!maxNetEarnings || netEarnings <= maxNetEarnings);
+        console.log(netEarnings, minNetEarnings, maxNetEarnings, b);
+        return b;
     };
 }

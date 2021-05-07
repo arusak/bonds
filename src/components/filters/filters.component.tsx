@@ -2,12 +2,12 @@ import classnames from 'classnames';
 import { filter, fromNullable, map } from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/pipeable';
 import React, { ChangeEvent, useState } from 'react';
-import { FilterDiff, FiltersValues, isFilterName } from '../../models/filters.model';
+import { FiltersDiff, FiltersValues, isFilterName } from '../../models/filters.model';
 import { getTransform } from '../../utils/filters.utils';
 import { sequenceTOption } from '../../utils/option.utils';
 import styles from './filters.module.sass';
 
-type OnFiltersChange = (updated: FilterDiff) => void;
+type OnFiltersChange = (updated: FiltersDiff) => void;
 type FiltersComponentProps = { filters: FiltersValues, onFiltersChange: OnFiltersChange };
 
 export const FiltersComponent = ({ filters, onFiltersChange }: FiltersComponentProps) => {
@@ -54,7 +54,7 @@ export const FiltersComponent = ({ filters, onFiltersChange }: FiltersComponentP
                            onChange={handleChange}/>
                 </div>
                 <div className={styles.parameter}>
-                    <label htmlFor="minToMature">Доходность</label>
+                    <label htmlFor="minNetEarnings">Доходность</label>
                     <input type="number" id="minNetEarnings" name="minNetEarnings" defaultValue={minNetEarnings}
                            onChange={handleChange}/>
                     <span> — </span>

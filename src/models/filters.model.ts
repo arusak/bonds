@@ -1,4 +1,5 @@
 import { Option } from 'fp-ts/lib/Option';
+import { exhaustiveStringTuple } from '../utils/type.utils';
 
 export type FiltersValues = {
     minVolume: number,
@@ -11,17 +12,21 @@ export type FiltersValues = {
     onlyCheap: boolean,
 }
 
+export type FiltersDiff = Option<Partial<FiltersValues>>;
+
 export type FilterName = keyof FiltersValues;
 
-export const filtersNames: FilterName[] = [
+// all the filter names for refinement
+const filtersNames: FilterName[] = exhaustiveStringTuple<FilterName>()(
     'minVolume',
     'name',
     'minToMature',
+    'minNetEarnings',
+    'maxNetEarnings',
     'maxToMature',
     'onlyActive',
     'onlyCheap',
-];
+);
 
-export type FilterDiff = Option<Partial<FiltersValues>>;
-
+// refinement for filter names
 export const isFilterName = (key: string): key is FilterName => filtersNames.includes(key as FilterName);
